@@ -86,6 +86,32 @@ let slice lst i k =
   List.rev (aux [] 0 lst)
 ;;
 
+(* 19 - rotate by n *)
+let rotate lst n =
+  (* doesn't handle -ve cases
+    let (ll, rl) = split lst n in
+    rl @ ll
+
+    also mod keeps the sign of operand
+    (-2) mod 7 = -2 not 5
+  *)
+  let len = List.length lst in
+  let n = if len = 0 then 0 else (n mod len + len) mod len in
+  if n = 0 then lst
+  else let (ll, rl) = split lst n in
+  rl @ ll
+;;
+
+(* 20 - remove kth *)
+let remove_at lst k =
+  let rec aux acc i = function
+    | [] -> acc
+    | hd :: tl ->
+        if i = k then aux acc (i + 1) tl
+        else aux (hd :: acc) (i + 1) tl
+  in
+  List.rev (aux [] 0 lst)
+;;
 
 let lst = ["a";"a";"a";"a";"b";"c";"c";"a";"a";"d";"e";"e";"e";"e"]
 let lst2 = [Many (4,"a"); One "b"; Many (2,"c"); Many (2,"a"); One "d"; Many (4,"e")]
@@ -107,7 +133,7 @@ let print_list f lst =
 ;;
 
 let () =
-  List.iter (fun x -> Printf.printf "%s " x) (slice lst4 2 6);
+  List.iter (fun x -> Printf.printf "%s " x) (remove_at lst4 3);
   print_newline ()
   (* match (split lst4 4) with *)
   (* | (x, y) -> print_list print_string x; print_list print_string y *)
