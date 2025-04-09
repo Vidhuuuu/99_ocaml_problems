@@ -92,11 +92,62 @@ let permutation lst =
   aux [] lst (List.length lst)
 ;;
 
+(* 26 - combinations *)
+let rec extract k lst =
+  match k, lst with
+  | 0, _ -> [[]]
+  | _, [] -> []
+  | k, hd :: tl ->
+      let with_hd =
+        extract (k - 1) tl
+        |> List.map (fun rest -> hd :: rest)
+      in
+      let without_hd = extract k tl in
+      with_hd @ without_hd
+;;
 
+(* 27 - group into disjoint subsets *)
+(* couldn't figure out, yet*)
+
+(* 28 - length and frequency sorting *)
+let length_sort lst =
+  List.sort (fun lst1 lst2 -> List.length lst1 - List.length lst2) lst
+;;
+
+(*
+  let frequency_sort lst =
+    let count_elem lst len =
+      List.fold_left (fun acc x ->
+        if List.length x = len then acc + 1 else acc) 0 lst
+    in
+    List.sort (fun lst1 lst2 ->
+      let len_lst1 = List.length lst1 in
+      let len_lst2 = List.length lst2 in
+      compare (count_elem lst len_lst1) (count_elem lst len_lst2)) lst 
+  ;;
+*)
+let frequency_sort lst =
+  let freq = Hashtbl.create 32 in
+  List.iter (fun sublst ->
+    let len = List.length sublst in
+    Hashtbl.replace freq len (1 + (Hashtbl.find_opt freq len
+        |> Option.value ~default:0))
+  ) lst;
+  List.sort (fun lst1 lst2 ->
+    let len_lst1 = List.length lst1 in
+    let len_lst2 = List.length lst2 in
+    compare (Hashtbl.find freq len_lst1) (Hashtbl.find freq len_lst2)
+  ) lst
+;;
 
 let lst = ["a"; "b"; "c"; "d"]
 let lst2 = ["a";"b";"c";"d";"e";"f";"g";"h"]
+let lst3 = [["a";"b";"c"]; ["d";"e"]; ["f";"g";"h"]; ["d";"e"];
+                ["i";"j";"k";"l"]; ["m";"n"]; ["o"]]
 
 let () =
-  List.iter (fun x -> Printf.printf "%s " x) (permutation lst2);
-  print_newline ()
+  (* List.iter (fun x -> Printf.printf "%s " x) (lst); *)
+  (* print_newline () *)
+  List.iter (fun x ->
+    List.iter (fun y ->
+      Printf.printf "%s " y) x; print_newline ()) (frequency_sort lst3)
